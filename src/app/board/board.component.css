@@ -2,8 +2,8 @@
     display: table;
 }
 input {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     text-align: center;
 }
 .board-row {
@@ -13,21 +13,47 @@ input {
 }
 .board-col {
     float: left;
-    border: 0 solid #000;
-}
-.board-col:nth-child(3n) {
-    border-right-width: 2px;
+    border: 1px solid #333;
 }
 .board-col:first-of-type {
-    border-left-width: 2px;
+    border-left-width: 4px;
+}
+.board-col:nth-child(3n) {
+    border-right-width: 3px
 }
 .board-col:last-of-type {
-    border-right-width: 2px;
+    border-right-width: 4px;
 }
 
 .board-row:first-of-type .board-col {
-    border-top-width: 2px;
+    border-top-width: 4px;
 }
 .board-row:nth-child(3n) .board-col {
-    border-bottom-width: 2px;
+    border-bottom-width: 3px;
+}
+.board-row:last-of-type .board-col {
+    border-bottom-width: 4px;
+}
+
+@media (min-width: 992px) {
+    /* input {
+        width: 40px;
+        height: 40px;
+    } */
+}
+input:focus {
+    outline: none;
+}
+input:focus {
+    background-color: aqua;
+}
+/* For Firefox */
+input[type='number'] {
+    -moz-appearance:textfield;
+}
+/* Webkit browsers like Safari and Chrome */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }

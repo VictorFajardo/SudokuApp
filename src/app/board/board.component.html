@@ -1,29 +1,4 @@
-<div *ngFor="let row of rows" class="board-row row1">
-  <div class="board-col col1">
-    <input type="number" min="0">
-  </div>
-  <div class="board-col col2">
-    <input type="number" min="0">
-  </div>
-  <div class="board-col col3">
-    <input type="number" min="0">
-  </div>
-  <div class="board-col col4">
-    <input type="number" min="0">
-  </div>
-  <div class="board-col col5">
-    <input type="number" min="0">
-  </div>
-  <div class="board-col col6">
-    <input type="number" min="0">
-  </div>
-  <div class="board-col col7">
-    <input type="number" min="0">
-  </div>
-  <div class="board-col col8">
-    <input type="number" min="0">
-  </div>
-  <div class="board-col col9">
-    <input type="number" min="0">
-  </div>
+<!-- <p>Board Component</p> -->
+<div *ngFor="let row of rows" class="board-row">
+  <input *ngFor="let col of columns" class="board-col" type="number" maxlength="1" (keydown)="onKeyDown($event)" (keyup)="onKeyUp($event)">
 </div>

@@ -7,13 +7,25 @@ import { Component, OnInit } from '@angular/core';
 })
 export class BoardComponent implements OnInit {
 
-  rows = [0, 0, 0, 0, 0, 0, 0, 0, 0];
-  columns = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+  rows = new Array(9);
+  columns = new Array(9);
 
   constructor() { }
 
   ngOnInit() {
-    console.log('rows', this.rows);
+    // console.log('rows', this.rows);
+  }
+
+  onKeyDown(event: any) {
+    event.target.value = '';
+  }
+
+  onKeyUp(event: any) {
+    if (event.target.value !== '' && event.key >= 1 && event.key <= 9) {
+      event.target.value = event.key;
+    } else if (event.key === 'e') {
+      event.target.value = '';
+    }
   }
 
 }
