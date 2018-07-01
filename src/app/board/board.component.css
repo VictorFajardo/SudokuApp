@@ -6,32 +6,35 @@ input {
     height: 40px;
     text-align: center;
 }
+input.error {
+    background-color: plum;
+}
 .board-row {
     display: table-row;
     overflow: auto;
     /* float: left; */
 }
-.board-col {
+.board-cell {
     float: left;
     border: 1px solid #333;
 }
-.board-col:first-of-type {
+.board-cell:first-of-type {
     border-left-width: 4px;
 }
-.board-col:nth-child(3n) {
+.board-cell:nth-child(3n) {
     border-right-width: 3px
 }
-.board-col:last-of-type {
+.board-cell:last-of-type {
     border-right-width: 4px;
 }
 
-.board-row:first-of-type .board-col {
+.board-row:first-of-type .board-cell {
     border-top-width: 4px;
 }
-.board-row:nth-child(3n) .board-col {
+.board-row:nth-child(3n) .board-cell {
     border-bottom-width: 3px;
 }
-.board-row:last-of-type .board-col {
+.board-row:last-of-type .board-cell {
     border-bottom-width: 4px;
 }
 

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-board',
@@ -21,10 +22,51 @@ export class BoardComponent implements OnInit {
   }
 
   onKeyUp(event: any) {
-    if (event.target.value !== '' && event.key >= 1 && event.key <= 9) {
-      event.target.value = event.key;
-    } else if (event.key === 'e') {
+    if (event.key === 'e' || event.key === '0') {
       event.target.value = '';
+    } else {
+      event.target.value = event.key;
+      this.checkBoard();
+    }
+  }
+
+  repeating(array) {
+    for (let i = 0; i < array.length; i++) {
+      for (let j = i + 1; j < array.length; j++) {
+        if (array[i].value === array[j].value && array[i].value !== '') {
+          array.addClass('error');
+          return;
+        }
+      }
+    }
+  }
+
+  removingErrors() {
+    $('.board-cell').each(function () {
+      $(this).removeClass('error');
+    });
+  }
+
+  checkBoard() {
+    this.removingErrors();
+    for (let index = 0; index < 9; index++) {
+      this.repeating($('[data-row=' + index + ']'));
+      this.repeating($('[data-col=' + index + ']'));
+      this.repeating($('[data-sector=' + index + ']'));
+    }
+    this.isFull();
+  }
+
+  isFull() {
+    for (let i = 0; i < 9; i++) {
+      for (let j = 0; j < 9; j++) {
+        if ($('[data-row=' + i + '][data-col=' + j + ']').val() === '' || $('[data-row=' + i + '][data-col=' + j + ']').hasClass('error')) {
+          console.log('incomplete');
+          return;
+        } else {
+          console.log('complete');
+        }
+      }
     }
   }
 
