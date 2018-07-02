@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import * as $ from 'jquery';
 
 @Component({
@@ -6,15 +6,51 @@ import * as $ from 'jquery';
   templateUrl: './board.component.html',
   styleUrls: ['./board.component.css']
 })
-export class BoardComponent implements OnInit {
+export class BoardComponent implements OnInit, AfterViewInit {
 
   rows = new Array(9);
   columns = new Array(9);
+  text = '';
 
   constructor() { }
 
-  ngOnInit() {
-    // console.log('rows', this.rows);
+  ngOnInit() { }
+
+  ngAfterViewInit() {
+    this.setupBoard();
+  }
+
+  setupBoard() {
+    // for (let i = 0; i < 9; i++) {
+      // const list = this.getSuffleArray();
+      for (let j = 0; j < 9; j++) {
+        const target = $('[data-row=' + j + '][data-col=' + j + ']');
+        const k = Number(target.attr('data-sector'));
+        // const col = Number(target.attr('data-col'));
+        // const value = this.getValidValue(row, col, sector);
+        const value = this.getRndInteger();
+        console.log(value);
+        if (this.getValidValue(value, j, j, k)) {
+          target.val(value);
+        }
+        // target.prop('disabled', true);
+
+      }
+    // }
+  }
+
+  getRndInteger() {
+    return Math.floor(Math.random() * 9 + 1);
+  }
+
+  getSuffleArray() {
+    const list: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+    const limit = Math.floor(Math.random() * 3 + 3);
+    for (let i = list.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list.slice(0, limit).sort();
   }
 
   onKeyDown(event: any) {
@@ -57,17 +93,37 @@ export class BoardComponent implements OnInit {
     this.isFull();
   }
 
+  getValidValue(value, row, col, sector) {
+    // const value = Math.floor(Math.random() * 9 + 1);
+    console.warn(value, row, col, sector);
+    if (this.validating(value, $('[data-row=' + row + ']'))
+      && this.validating(value, $('[data-col=' + col + ']'))
+      && this.validating(value, $('[data-sector=' + sector + ']'))) {
+      return value;
+    } else {
+      return this.getValidValue(value, row, col, sector);
+    }
+  }
+
+  validating(value, array) {
+    for (let i = 0; i < array.length; i++) {
+      if (value === Number(array[i].value)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   isFull() {
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
         if ($('[data-row=' + i + '][data-col=' + j + ']').val() === '' || $('[data-row=' + i + '][data-col=' + j + ']').hasClass('error')) {
           console.log('incomplete');
           return;
-        } else {
-          console.log('complete');
         }
       }
     }
+    console.log('complete');
   }
 
 }
