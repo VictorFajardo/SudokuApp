@@ -23,6 +23,7 @@ export class BoardComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.setupBoard();
+    this.cleanCell();
   }
 
   setupBoard() {
@@ -38,8 +39,6 @@ export class BoardComponent implements OnInit, AfterViewInit {
   }
 
   fillCell(count, stopped, backtrack) {
-    // const row = (this.board[count] - this.board[count] % 10) / 10;
-    // const col = this.board[count] % 10;
     const target = $('[data-row=' + (this.grid[count] - this.grid[count] % 10) / 10 + '][data-col=' + this.grid[count] % 10 + ']');
     const values = this.getAllowedValues(target);
     const value = values[this.getRndInteger(0, values.length - 1)];
@@ -64,6 +63,16 @@ export class BoardComponent implements OnInit, AfterViewInit {
     }
     if (count < 81) {
       this.fillCell(count, stopped, backtrack);
+    }
+  }
+
+  cleanCell() {
+    const count = this.getRndInteger(0, this.grid.length);
+    const target = $('[data-row=' + (this.grid[count] - this.grid[count] % 10) / 10 + '][data-col=' + this.grid[count] % 10 + ']');
+    this.grid.splice(count, 1);
+    target.val('');
+    if (this.grid.length > 35) {
+      this.cleanCell();
     }
   }
 
