@@ -9,10 +9,12 @@ input {
 input.error {
     background-color: plum;
 }
+input.completed {
+    background-color: burlywood !important;
+}
 .board-row {
     display: table-row;
     overflow: auto;
-    /* float: left; */
 }
 .board-cell {
     float: left;

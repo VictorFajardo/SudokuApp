@@ -10,37 +10,69 @@ export class BoardComponent implements OnInit, AfterViewInit {
 
   rows = new Array(9);
   columns = new Array(9);
+  board = [];
   text = '';
 
   constructor() { }
 
-  ngOnInit() { }
+  ngOnInit() {
+    // this.setupBoard();
+  }
 
   ngAfterViewInit() {
+    // setTimeout(this., timeout);
     this.setupBoard();
   }
 
   setupBoard() {
-    // for (let i = 0; i < 9; i++) {
-      // const list = this.getSuffleArray();
+    for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
-        const target = $('[data-row=' + j + '][data-col=' + j + ']');
-        const k = Number(target.attr('data-sector'));
-        // const col = Number(target.attr('data-col'));
-        // const value = this.getValidValue(row, col, sector);
-        const value = this.getRndInteger();
-        console.log(value);
-        if (this.getValidValue(value, j, j, k)) {
-          target.val(value);
-        }
-        // target.prop('disabled', true);
-
+        this.board.push(i * 10 + j);
       }
-    // }
+    }
+    console.log(this.board);
+    let count = 0;
+    let stopped;
+    let backtrack;
+    // while (count < 81) {
+    this.looper(count, stopped, backtrack);
+
+  }
+  looper(count, stopped, backtrack) {
+    const row = (this.board[count] - this.board[count] % 10) / 10;
+    const col = this.board[count] % 10;
+    const target = $('[data-row=' + row + '][data-col=' + col + ']');
+    // const sector = Number(target.attr('data-sector'));
+
+    const values = this.getAllowedValues(target);
+    const value = values[this.getRndInteger(0, values.length - 1)];
+
+    if (values.length === 0) {
+      // target.prop('disabled', true);
+      if (stopped !== count) {
+        console.log('break point', count);
+        stopped = count;
+        backtrack = 0;
+      }
+      backtrack++;
+      console.log('backtracking', backtrack);
+      for (let i = 0; i < backtrack; i++) {
+        // tslint:disable-next-line:max-line-length
+        $('[data-row=' + (this.board[count - i - 1] - this.board[count - i - 1] % 10) / 10 + '][data-col=' + this.board[count - i - 1] % 10 + ']').val('');
+      }
+      count -= backtrack;
+      // j--;
+    } else {
+      target.val(value);
+      count++;
+    }
+    if (count < 81) {
+      setTimeout(this.looper(count, stopped, backtrack), 200);
+    }
   }
 
-  getRndInteger() {
-    return Math.floor(Math.random() * 9 + 1);
+  getRndInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
   getSuffleArray() {
@@ -51,6 +83,27 @@ export class BoardComponent implements OnInit, AfterViewInit {
       [list[i], list[j]] = [list[j], list[i]];
     }
     return list.slice(0, limit).sort();
+  }
+
+  getAllowedValues(target) {
+    const sector = Number(target.attr('data-sector'));
+    const col = Number(target.attr('data-col'));
+    const row = Number(target.attr('data-row'));
+
+    const temp = [];
+    for (let value = 1; value <= 9; value++) {
+      if (this.validating(value, $('[data-row=' + row + ']'))
+        && this.validating(value, $('[data-col=' + col + ']'))
+        && this.validating(value, $('[data-sector=' + sector + ']'))) {
+        temp.push(value);
+      }
+    }
+    // console.log('getAllowedValues', temp);
+    return temp;
+  }
+
+  onClick(event: any) {
+    console.log(this.getAllowedValues($(event.target)));
   }
 
   onKeyDown(event: any) {
@@ -99,9 +152,9 @@ export class BoardComponent implements OnInit, AfterViewInit {
     if (this.validating(value, $('[data-row=' + row + ']'))
       && this.validating(value, $('[data-col=' + col + ']'))
       && this.validating(value, $('[data-sector=' + sector + ']'))) {
-      return value;
+      return true;
     } else {
-      return this.getValidValue(value, row, col, sector);
+      return false;
     }
   }
 
@@ -118,12 +171,15 @@ export class BoardComponent implements OnInit, AfterViewInit {
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
         if ($('[data-row=' + i + '][data-col=' + j + ']').val() === '' || $('[data-row=' + i + '][data-col=' + j + ']').hasClass('error')) {
-          console.log('incomplete');
+          // console.log('incomplete');
           return;
         }
       }
     }
-    console.log('complete');
+    // console.log('complete');
+    $('input').each(function () {
+      $(this).addClass('completed');
+    });
   }
 
 }

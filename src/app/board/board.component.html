@@ -1,4 +1,4 @@
 <!-- <h3>Board Component</h3> -->
 <div *ngFor="let row of rows; let i = index" class="board-row ">
-  <input *ngFor="let col of columns; let j = index" class="board-cell" attr.data-row="{{i}}" attr.data-col="{{j}}" attr.data-sector="{{(i - i%3) + (j-j%3)/3}}" type="number" (keydown)="onKeyDown($event)" (keyup)="onKeyUp($event)">
+  <input *ngFor="let col of columns; let j = index" class="board-cell" attr.data-row="{{i}}" attr.data-col="{{j}}" attr.data-sector="{{(i - i%3) + (j-j%3)/3}}" type="number" (keydown)="onKeyDown($event)" (keyup)="onKeyUp($event)" (click)="onClick($event)">
 </div>
