@@ -10,8 +10,10 @@ export class BoardComponent implements OnInit, AfterViewInit {
 
   rows = new Array(9);
   columns = new Array(9);
-  board = [];
-  text = '';
+  grid = [];
+  count;
+  stopped;
+  backtrack;
 
   constructor() { }
 
@@ -20,30 +22,25 @@ export class BoardComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // setTimeout(this., timeout);
     this.setupBoard();
   }
 
   setupBoard() {
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
-        this.board.push(i * 10 + j);
+        this.grid.push(i * 10 + j);
       }
     }
-    console.log(this.board);
-    let count = 0;
-    let stopped;
-    let backtrack;
-    // while (count < 81) {
-    this.looper(count, stopped, backtrack);
-
+    this.count = 0;
+    this.stopped = 0;
+    this.backtrack = 0;
+    this.fillCell(this.count, this.stopped, this.backtrack);
   }
-  looper(count, stopped, backtrack) {
-    const row = (this.board[count] - this.board[count] % 10) / 10;
-    const col = this.board[count] % 10;
-    const target = $('[data-row=' + row + '][data-col=' + col + ']');
-    // const sector = Number(target.attr('data-sector'));
 
+  fillCell(count, stopped, backtrack) {
+    // const row = (this.board[count] - this.board[count] % 10) / 10;
+    // const col = this.board[count] % 10;
+    const target = $('[data-row=' + (this.grid[count] - this.grid[count] % 10) / 10 + '][data-col=' + this.grid[count] % 10 + ']');
     const values = this.getAllowedValues(target);
     const value = values[this.getRndInteger(0, values.length - 1)];
 
@@ -58,16 +55,15 @@ export class BoardComponent implements OnInit, AfterViewInit {
       console.log('backtracking', backtrack);
       for (let i = 0; i < backtrack; i++) {
         // tslint:disable-next-line:max-line-length
-        $('[data-row=' + (this.board[count - i - 1] - this.board[count - i - 1] % 10) / 10 + '][data-col=' + this.board[count - i - 1] % 10 + ']').val('');
+        $('[data-row=' + (this.grid[count - i - 1] - this.grid[count - i - 1] % 10) / 10 + '][data-col=' + this.grid[count - i - 1] % 10 + ']').val('');
       }
       count -= backtrack;
-      // j--;
     } else {
       target.val(value);
       count++;
     }
     if (count < 81) {
-      setTimeout(this.looper(count, stopped, backtrack), 200);
+      this.fillCell(count, stopped, backtrack);
     }
   }
 
