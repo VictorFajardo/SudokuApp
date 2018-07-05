@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { DataService } from '../shared/data.service';
 import * as $ from 'jquery';
 
 @Component({
@@ -8,14 +9,22 @@ import * as $ from 'jquery';
 })
 export class BoardComponent implements OnInit, AfterViewInit {
 
+  grid = [];
   rows = new Array(9);
   columns = new Array(9);
-  grid = [];
+  row;
+  col;
   count;
   stopped;
   backtrack;
+  subscription;
 
-  constructor() { }
+  constructor(private data: DataService) {
+    this.subscription = this.data.cellValue.subscribe(
+      params => {
+        this.updateCell(params);
+      });
+  }
 
   ngOnInit() {
     // this.setupBoard();
@@ -42,16 +51,14 @@ export class BoardComponent implements OnInit, AfterViewInit {
     const target = $('[data-row=' + (this.grid[count] - this.grid[count] % 10) / 10 + '][data-col=' + this.grid[count] % 10 + ']');
     const values = this.getAllowedValues(target);
     const value = values[this.getRndInteger(0, values.length - 1)];
-
     if (values.length === 0) {
-      // target.prop('disabled', true);
       if (stopped !== count) {
-        console.log('break point', count);
+        // console.log('break point', count);
         stopped = count;
         backtrack = 0;
       }
       backtrack++;
-      console.log('backtracking', backtrack);
+      // console.log('backtracking', backtrack);
       for (let i = 0; i < backtrack; i++) {
         // tslint:disable-next-line:max-line-length
         $('[data-row=' + (this.grid[count - i - 1] - this.grid[count - i - 1] % 10) / 10 + '][data-col=' + this.grid[count - i - 1] % 10 + ']').val('');
@@ -70,7 +77,7 @@ export class BoardComponent implements OnInit, AfterViewInit {
     const count = this.getRndInteger(0, this.grid.length);
     const target = $('[data-row=' + (this.grid[count] - this.grid[count] % 10) / 10 + '][data-col=' + this.grid[count] % 10 + ']');
     this.grid.splice(count, 1);
-    target.val('');
+    target.val('').prop('disabled', false);
     if (this.grid.length > 35) {
       this.cleanCell();
     }
@@ -80,21 +87,20 @@ export class BoardComponent implements OnInit, AfterViewInit {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
-  getSuffleArray() {
-    const list: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-    const limit = Math.floor(Math.random() * 3 + 3);
-    for (let i = list.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [list[i], list[j]] = [list[j], list[i]];
-    }
-    return list.slice(0, limit).sort();
-  }
+  // getSuffleArray() {
+  //   const list: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  //   const limit = Math.floor(Math.random() * 3 + 3);
+  //   for (let i = list.length - 1; i > 0; i--) {
+  //     const j = Math.floor(Math.random() * (i + 1));
+  //     [list[i], list[j]] = [list[j], list[i]];
+  //   }
+  //   return list.slice(0, limit).sort();
+  // }
 
   getAllowedValues(target) {
     const sector = Number(target.attr('data-sector'));
     const col = Number(target.attr('data-col'));
     const row = Number(target.attr('data-row'));
-
     const temp = [];
     for (let value = 1; value <= 9; value++) {
       if (this.validating(value, $('[data-row=' + row + ']'))
@@ -103,25 +109,7 @@ export class BoardComponent implements OnInit, AfterViewInit {
         temp.push(value);
       }
     }
-    // console.log('getAllowedValues', temp);
     return temp;
-  }
-
-  onClick(event: any) {
-    console.log(this.getAllowedValues($(event.target)));
-  }
-
-  onKeyDown(event: any) {
-    event.target.value = '';
-  }
-
-  onKeyUp(event: any) {
-    if (event.key === 'e' || event.key === '0') {
-      event.target.value = '';
-    } else {
-      event.target.value = event.key;
-      this.checkBoard();
-    }
   }
 
   repeating(array) {
@@ -151,22 +139,14 @@ export class BoardComponent implements OnInit, AfterViewInit {
     this.isFull();
   }
 
-  getValidValue(value, row, col, sector) {
-    // const value = Math.floor(Math.random() * 9 + 1);
-    console.warn(value, row, col, sector);
-    if (this.validating(value, $('[data-row=' + row + ']'))
-      && this.validating(value, $('[data-col=' + col + ']'))
-      && this.validating(value, $('[data-sector=' + sector + ']'))) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   validating(value, array) {
     for (let i = 0; i < array.length; i++) {
       if (value === Number(array[i].value)) {
-        return false;
+        if (Number($(array[i]).attr('data-row')) === this.row && Number($(array[i]).attr('data-col') === this.col)) {
+          return true;
+        } else {
+          return false;
+        }
       }
     }
     return true;
@@ -176,15 +156,42 @@ export class BoardComponent implements OnInit, AfterViewInit {
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
         if ($('[data-row=' + i + '][data-col=' + j + ']').val() === '' || $('[data-row=' + i + '][data-col=' + j + ']').hasClass('error')) {
-          // console.log('incomplete');
           return;
         }
       }
     }
-    // console.log('complete');
-    $('input').each(function () {
+    $('.board-cell').each(function () {
       $(this).addClass('completed');
     });
+  }
+
+  // Click Functions
+  onClick(event: any) {
+    $('.board-cell.selected').removeClass('selected');
+    $(event.target).addClass('selected');
+    this.row = Number($(event.target).attr('data-row'));
+    this.col = Number($(event.target).attr('data-col'));
+    this.data.setAllowedValues(this.getAllowedValues($(event.target)));
+    // console.log(this.row, this.col);
+  }
+
+  onKeyDown(event: any) {
+    event.target.value = '';
+  }
+
+  onKeyUp(event: any) {
+    if (event.key === 'e' || event.key === '0') {
+      event.target.value = '';
+    } else {
+      event.target.value = event.key;
+      this.checkBoard();
+    }
+  }
+
+  // Service Functions
+  updateCell(value) {
+    $('[data-row=' + this.row + '][data-col=' + this.col + ']').val(value);
+    this.checkBoard();
   }
 
 }

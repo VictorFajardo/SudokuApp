@@ -5,12 +5,16 @@ input {
     width: 40px;
     height: 40px;
     text-align: center;
+    font-weight: bold;
 }
 input.error {
     background-color: plum;
 }
 input.completed {
     background-color: burlywood !important;
+}
+input.selected {
+    background-color: aqua;
 }
 .board-row {
     display: table-row;
@@ -45,6 +49,9 @@ input.completed {
         width: 40px;
         height: 40px;
     } */
+}
+input:disabled.error{
+    background-color: orchid;
 }
 input:focus {
     outline: none;
