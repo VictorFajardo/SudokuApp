@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { DataService } from '../shared/data.service';
 import * as $ from 'jquery';
+import { HtmlParser } from '@angular/compiler';
 
 @Component({
   selector: 'app-board',
@@ -32,7 +33,19 @@ export class BoardComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.setupBoard();
+    this.printBoard();
     this.cleanCell();
+  }
+
+  // Dev
+  printBoard() {
+    $('.board-row').each(function () {
+      let data = '';
+      $('.board-cell', this).each(function () {
+        data += $(this).html();
+      });
+      console.log(data);
+    });
   }
 
   setupBoard() {
@@ -48,6 +61,7 @@ export class BoardComponent implements OnInit, AfterViewInit {
   }
 
   fillCell(count, stopped, backtrack) {
+    // tslint:disable-next-line:max-line-length
     const target = $('[data-row=' + (this.grid[count] - this.grid[count] % 10) / 10 + '][data-col=' + this.grid[count] % 10 + ']');
     const values = this.getAllowedValues(target);
     const value = values[this.getRndInteger(0, values.length - 1)];
@@ -61,11 +75,12 @@ export class BoardComponent implements OnInit, AfterViewInit {
       // console.log('backtracking', backtrack);
       for (let i = 0; i < backtrack; i++) {
         // tslint:disable-next-line:max-line-length
-        $('[data-row=' + (this.grid[count - i - 1] - this.grid[count - i - 1] % 10) / 10 + '][data-col=' + this.grid[count - i - 1] % 10 + ']').val('');
+        $('[data-row=' + (this.grid[count - i - 1] - this.grid[count - i - 1] % 10) / 10 + '][data-col=' + this.grid[count - i - 1] % 10 + '] .board-cell').html('');
       }
       count -= backtrack;
     } else {
-      target.val(value);
+      // target.val(value);
+      $('.board-cell', target).html(value);
       count++;
     }
     if (count < 81) {
@@ -77,8 +92,9 @@ export class BoardComponent implements OnInit, AfterViewInit {
     const count = this.getRndInteger(0, this.grid.length);
     const target = $('[data-row=' + (this.grid[count] - this.grid[count] % 10) / 10 + '][data-col=' + this.grid[count] % 10 + ']');
     this.grid.splice(count, 1);
-    target.val('').prop('disabled', false);
-    if (this.grid.length > 35) {
+    $('.board-cell', target).html('');
+    target.removeClass('disabled');
+    if (this.grid.length > 32) {
       this.cleanCell();
     }
   }
@@ -86,16 +102,6 @@ export class BoardComponent implements OnInit, AfterViewInit {
   getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
-
-  // getSuffleArray() {
-  //   const list: number[] = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-  //   const limit = Math.floor(Math.random() * 3 + 3);
-  //   for (let i = list.length - 1; i > 0; i--) {
-  //     const j = Math.floor(Math.random() * (i + 1));
-  //     [list[i], list[j]] = [list[j], list[i]];
-  //   }
-  //   return list.slice(0, limit).sort();
-  // }
 
   getAllowedValues(target) {
     const sector = Number(target.attr('data-sector'));
@@ -115,7 +121,7 @@ export class BoardComponent implements OnInit, AfterViewInit {
   repeating(array) {
     for (let i = 0; i < array.length; i++) {
       for (let j = i + 1; j < array.length; j++) {
-        if (array[i].value === array[j].value && array[i].value !== '') {
+        if ($('.board-cell', array[i]).html() === $('.board-cell', array[j]).html() && $('.board-cell', array[i]).html() !== '') {
           array.addClass('error');
           return;
         }
@@ -124,7 +130,7 @@ export class BoardComponent implements OnInit, AfterViewInit {
   }
 
   removingErrors() {
-    $('.board-cell').each(function () {
+    $('.board-cell-container.error').each(function () {
       $(this).removeClass('error');
     });
   }
@@ -141,8 +147,8 @@ export class BoardComponent implements OnInit, AfterViewInit {
 
   validating(value, array) {
     for (let i = 0; i < array.length; i++) {
-      if (value === Number(array[i].value)) {
-        if (Number($(array[i]).attr('data-row')) === this.row && Number($(array[i]).attr('data-col') === this.col)) {
+      if (value === Number($('.board-cell', array[i]).html())) {
+        if (Number($(array[i]).attr('data-row')) === this.row && Number($(array[i]).attr('data-col')) === this.col) {
           return true;
         } else {
           return false;
@@ -155,43 +161,53 @@ export class BoardComponent implements OnInit, AfterViewInit {
   isFull() {
     for (let i = 0; i < 9; i++) {
       for (let j = 0; j < 9; j++) {
-        if ($('[data-row=' + i + '][data-col=' + j + ']').val() === '' || $('[data-row=' + i + '][data-col=' + j + ']').hasClass('error')) {
+        // tslint:disable-next-line:max-line-length
+        if ($('[data-row=' + i + '][data-col=' + j + '] .board-cell').html() === '' || $('[data-row=' + i + '][data-col=' + j + ']').hasClass('error')) {
           return;
         }
       }
     }
-    $('.board-cell').each(function () {
-      $(this).addClass('completed');
+    $('.board-cell-container').each(function () {
+      $(this).addClass('disabled completed');
     });
   }
 
   // Click Functions
   onClick(event: any) {
-    $('.board-cell.selected').removeClass('selected');
-    $(event.target).addClass('selected');
-    this.row = Number($(event.target).attr('data-row'));
-    this.col = Number($(event.target).attr('data-col'));
-    this.data.setAllowedValues(this.getAllowedValues($(event.target)));
-    // console.log(this.row, this.col);
+    $('.board-cell-container.selected').removeClass('selected');
+    $(event.target).parent().addClass('selected');
+    this.row = Number($(event.target).parent().attr('data-row'));
+    this.col = Number($(event.target).parent().attr('data-col'));
+    // this.data.setAllowedValues(this.getAllowedValues($(event.target).parent()));
   }
 
   onKeyDown(event: any) {
-    event.target.value = '';
+    // $(event.target).html('');
+    // $('.board-cell:focus').hide();
   }
 
   onKeyUp(event: any) {
-    if (event.key === 'e' || event.key === '0') {
-      event.target.value = '';
-    } else {
-      event.target.value = event.key;
-      this.checkBoard();
+    if (!$(event.target).parent().hasClass('disabled')) {
+      if (event.keyCode >= 49 && event.keyCode <= 57) {
+        $(event.target).html(event.key);
+        this.checkBoard();
+      }
+      if (event.keyCode === 8 || event.keyCode === 46) {
+        $(event.target).html('');
+        this.checkBoard();
+      }
     }
   }
 
   // Service Functions
   updateCell(value) {
-    $('[data-row=' + this.row + '][data-col=' + this.col + ']').val(value);
-    this.checkBoard();
+    if (!$('[data-row=' + this.row + '][data-col=' + this.col + ']').hasClass('disabled')) {
+      if (value === 'eraser') {
+        value = '';
+      }
+      $('[data-row=' + this.row + '][data-col=' + this.col + '] .board-cell').html(value).focus();
+      this.checkBoard();
+    }
   }
 
 }

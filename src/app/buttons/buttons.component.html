@@ -1,5 +1,11 @@
 <div>
-  <button *ngFor="let number of numbers" type="button" id="btn-{{number}}" class="btn btn-primary button" (click)="onClick(number)" disabled>
+  <button *ngFor="let number of numbers" type="button" id="btn-{{number}}" class="btn btn-primary button" (click)="onClick(number)">
     {{number}}
+  </button>
+  <button class="btn btn-info button" (click)="onClickEraser()">
+    <i class="fas fa-eraser"></i>
+  </button>
+  <button class="btn btn-secondary button" (click)="onClickPencil()">
+    <i class="fas fa-pencil-alt"></i>
   </button>
 </div>

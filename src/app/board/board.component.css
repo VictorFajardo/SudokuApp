@@ -1,46 +1,54 @@
 :host {
     display: table;
 }
-input {
-    width: 40px;
-    height: 40px;
+.board-cell-container {
+    width: 55px;
+    height: 55px;
     text-align: center;
     font-weight: bold;
+    float: left;
+    border: 1px solid #333;
 }
-input.error {
+.board-cell-container.error {
     background-color: plum;
 }
-input.completed {
+.board-cell-container.completed {
     background-color: burlywood !important;
 }
-input.selected {
-    background-color: aqua;
+.board-cell-container.selected {
+    /* background-color: aqua; */
+}
+.board-cell-container.disabled {
+    background-color: #ebebe4;
 }
 .board-row {
     display: table-row;
     overflow: auto;
 }
 .board-cell {
-    float: left;
-    border: 1px solid #333;
+    height: 100%;
+    width: 100%;
+    outline: none;
+    user-select: none;
+    font-size: 2em;
 }
-.board-cell:first-of-type {
+.board-cell-container:first-of-type {
     border-left-width: 4px;
 }
-.board-cell:nth-child(3n) {
+.board-cell-container:nth-child(3n) {
     border-right-width: 3px
 }
-.board-cell:last-of-type {
+.board-cell-container:last-of-type {
     border-right-width: 4px;
 }
 
-.board-row:first-of-type .board-cell {
+.board-row:first-of-type .board-cell-container {
     border-top-width: 4px;
 }
-.board-row:nth-child(3n) .board-cell {
+.board-row:nth-child(3n) .board-cell-container {
     border-bottom-width: 3px;
 }
-.board-row:last-of-type .board-cell {
+.board-row:last-of-type .board-cell-container {
     border-bottom-width: 4px;
 }
 
@@ -50,22 +58,13 @@ input.selected {
         height: 40px;
     } */
 }
-input:disabled.error{
+.board-cell-container.disabled.error{
     background-color: orchid;
 }
-input:focus {
+.board-cell:focus {
     outline: none;
-}
-input:focus {
     background-color: aqua;
 }
-/* For Firefox */
-input[type='number'] {
-    -moz-appearance:textfield;
-}
-/* Webkit browsers like Safari and Chrome */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+.board-cell-container:focus {
+    background-color: aqua;
 }

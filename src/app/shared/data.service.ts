@@ -8,18 +8,18 @@ import { Observable } from 'rxjs';
 export class DataService {
 
   // private sharedData = new Subject<any>();
-  private allowedValuesSource = new Subject<any>();
+  // private allowedValuesSource = new Subject<any>();
   private cellValueSource = new Subject<any>();
 
-  allowedValues = this.allowedValuesSource.asObservable();
+  // allowedValues = this.allowedValuesSource.asObservable();
   cellValue = this.cellValueSource.asObservable();
 
   constructor() { }
 
-  setAllowedValues(values) {
-    // console.log('data service', values);
-    this.allowedValuesSource.next(values);
-  }
+  // setAllowedValues(values) {
+  //   // console.log('data service', values);
+  //   this.allowedValuesSource.next(values);
+  // }
 
   setCellValue(value) {
     // console.log('data service', value);
